@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIVA - National Institute of Visual Acuity & Focus Test</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        clinicalBlue: '#0F172A',
+                        medicalAccent: '#0284C7',
+                        medicalBg: '#F8FAFC',
+                        medicalCard: '#FFFFFF',
+                    },
+                    keyframes: {
+                        extremeShake: {
+                            '0%, 100%': { transform: 'translate(0, 0) scale(1) rotate(0deg)' },
+                            '10%': { transform: 'translate(-35px, -25px) scale(1.15) rotate(-6deg)' },
+                            '20%': { transform: 'translate(30px, 35px) scale(1.2) rotate(6deg)' },
+                            '30%': { transform: 'translate(-40px, 15px) scale(1.1) rotate(-8deg)' },
+                            '40%': { transform: 'translate(35px, -30px) scale(1.25) rotate(7deg)' },
+                            '50%': { transform: 'translate(-25px, 35px) scale(1.15) rotate(-5deg)' },
+                            '60%': { transform: 'translate(40px, 20px) scale(1.3) rotate(8deg)' },
+                            '70%': { transform: 'translate(-35px, -35px) scale(1.2) rotate(-7deg)' },
+                            '80%': { transform: 'translate(25px, -20px) scale(1.1) rotate(5deg)' },
+                            '90%': { transform: 'translate(-30px, 25px) scale(1.25) rotate(-6deg)' },
+                        },
+                        strobeHorror: {
+                            '0%, 100%': { backgroundColor: '#000000' },
+                            '20%': { backgroundColor: '#FF0000' },
+                            '40%': { backgroundColor: '#ffffff' },
+                            '60%': { backgroundColor: '#4a0000' },
+                            '80%': { backgroundColor: '#110000' },
+                        },
+                        flashCamera: {
+                            '0%': { opacity: '1', backgroundColor: '#FFFFFF' },
+                            '100%': { opacity: '0', backgroundColor: 'transparent' }
+                        },
+                        dripBlood: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(0%)' }
+                        }
+                    },
+                    animation: {
+                        extremeShake: 'extremeShake 0.05s infinite',
+                        strobeHorror: 'strobeHorror 0.04s infinite',
+                        flashCamera: 'flashCamera 0.4s ease-out forwards',
+                        dripBlood: 'dripBlood 2s ease-out forwards'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            background-color: #f1f5f9;
+        }
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Grid pattern background for clinical feel */
+        .bg-grid-pattern {
+            background-size: 30px 30px;
+            background-image: 
+                linear-gradient(to right, rgba(226, 232, 240, 0.8) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(226, 232, 240, 0.8) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="bg-grid-pattern text-slate-800 min-h-screen flex flex-col justify-between items-center relative overflow-x-hidden">
+
+    <!-- Clinical Top Header -->
+    <header class="w-full bg-white border-b border-slate-200 py-3.5 px-6 shadow-sm z-10 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md shadow-sky-200">
+                ✚
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="font-bold text-slate-900 text-base tracking-tight">NIVA LABS</h1>
+                    <span class="text-[10px] bg-sky-100 text-sky-800 font-bold px-2 py-0.5 rounded border border-sky-200">VERIFIED ISO-9001</span>
+                </div>
+                <p class="text-xs text-slate-500">National Institute of Visual Acuity & Ophthalmic Research</p>
+            </div>
+        </div>
+        <div class="hidden md:flex items-center gap-4 text-xs font-mono text-slate-500">
+            <span>SESSION: <strong class="text-slate-800" id="session-id">NV-8829</strong></span>
+            <span class="text-emerald-600 font-semibold flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> SYSTEM READY
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Interactive Container -->
+    <main class="w-full max-w-2xl px-4 py-8 flex-1 flex flex-col justify-center items-center z-10">
+
+        <!-- STEP 0: Calibration & Medical Consent -->
+        <div id="step-0" class="w-full bg-white rounded-3xl p-6 md:p-10 shadow-xl border border-slate-200/80 transition-all">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+                <div>
+                    <span class="text-xs font-bold text-sky-600 uppercase tracking-wider">Đánh Giá Thị Lực Lâm Sàng</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Bài Kiểm Tra Độ Nhạy Thị Giác Vi Mô</h2>
+                </div>
+                <span class="text-3xl">👁️‍🗨️</span>
+            </div>
+
+            <p class="text-slate-600 text-sm leading-relaxed mb-6">
+                Hệ thống chuẩn đoán thuật toán AI phân tích **độ nhạy tương phản võng mạc (Contrast Sensitivity Index)**. Bài test yêu cầu kích hoạt phản ứng thị giác-thần kinh bằng âm thanh định tần 440Hz.
+            </p>
+
+            <!-- Audio Calibration Panel -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-8">
+                <div class="flex items-start gap-4">
+                    <div class="p-3 bg-sky-50 text-sky-600 rounded-xl text-xl">🔊</div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-slate-800 text-sm">Yêu cầu Hiệu Chỉnh Âm Thanh (Audio Calibration)</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Để thuật toán hoạt động chính xác, vui lòng **bật loa thiết bị lên khoảng 70% - 100%** hoặc đeo tai nghe. Nhấn nút bên dưới để phát âm tần hiệu chuẩn.
+                        </p>
+                        <button id="btn-calibrate" onclick="calibrateAudio()" class="mt-3 px-4 py-2 bg-sky-100 hover:bg-sky-200 text-sky-700 font-bold text-xs rounded-lg transition-all flex items-center gap-2 border border-sky-300">
+                            <span>▶ Phát Âm Tần Thử Nghiệm (440Hz)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="btn-start" onclick="startTest()" class="w-full py-4 bg-sky-600 hover:bg-sky-700 active:scale-[0.99] text-white font-bold rounded-2xl shadow-lg shadow-sky-200 transition-all text-base flex items-center justify-center gap-2">
+                <span>Bắt Đầu Kiểm Tra (3 Bước)</span>
+                <span class="text-lg">→</span>
+            </button>
+            
+            <div class="mt-6 flex items-center justify-center gap-6 text-xs text-slate-400 font-medium">
+                <span>🔒 Bảo mật thông tin</span>
+                <span>•</span>
+                <span>⏱️ Thời gian: 45 giây</span>
+                <span>•</span>
+                <span>📊 Độ chính xác 99.2%</span>
+            </div>
+        </div>
+
+        <!-- STEP 1: Fake Warm-up Question -->
+        <div id="step-1" class="hidden w-full bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-200">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-3">
+                <span class="text-xs font-bold text-sky-600 bg-sky-50 px-3 py-1 rounded-full border border-sky-100">BƯỚC 1 / 3: PHÂN GIẢI SẮC THÁI</span>
+                <span class="text-xs font-mono text-slate-400">STAGE_01_WARMUP</span>
+            </div>
+
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Chọn ô vuông có sắc độ màu ĐỘC LẬP:</h3>
+            <p class="text-xs text-slate-500 mb-6">Nhấp vào ô có độ bão hòa màu khác biệt so với các ô còn lại.</p>
+
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <button onclick="nextStep(2)" class="h-24 bg-emerald-500 rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-sm"></button>
+                <button onclick="nextStep(2)" class="h-24 bg-emerald-500 rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-sm"></button>
+                <button onclick="nextStep(2)" class="h-24 bg-emerald-500 rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-sm"></button>
+                <button onclick="nextStep(2)" class="h-24 bg-emerald-500 rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-sm"></button>
+                <button onclick="nextStep(2)" class="h-24 bg-emerald-400 rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-sm ring-2 ring-emerald-300 ring-offset-2"></button>
+                <button onclick="nextStep(2)" class="h-24 bg-emerald-500 rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-sm"></button>
+            </div>
+            
+            <p class="text-center text-xs text-slate-400">Chờ phản hồi võng mạc...</p>
+        </div>
+
+        <!-- STEP 2: The Ultimate Trap (Contrast Sensitivity Test) -->
+        <div id="step-2" class="hidden w-full bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-200">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                <span class="text-xs font-bold text-rose-600 bg-rose-50 px-3 py-1 rounded-full border border-rose-100">BƯỚC 2 / 3: TƯƠNG PHẢN CHUYÊN SÂU</span>
+                <span class="text-xs font-mono text-rose-500 font-bold animate-pulse">CRITICAL ASSESSMENT</span>
+            </div>
+
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Đo Độ Nhạy Tương Phản Điểm Ảnh Vi Mô</h3>
+            
+            <!-- Instructions box -->
+            <div class="bg-amber-50 border border-amber-200/80 rounded-2xl p-4 mb-5 text-xs text-amber-900 space-y-1.5 leading-relaxed">
+                <p class="font-bold flex items-center gap-1.5 text-amber-800">
+                    <span>⚠️ HƯỚNG DẪN QUAN TRỌNG ĐỂ CÓ KẾT QUẢ CHÍNH XÁC:</span>
+                </p>
+                <p>1. Ghé mắt lại gần màn hình ở khoảng cách **15cm - 20cm**.</p>
+                <p>2. Tập trung nhìn chằm chằm vào **chấm đỏ chớp nháy ở tâm** bài test.</p>
+                <p>3. **TUYỆT ĐỐI KHÔNG CHỚP MẮT** trong suốt 10 giây quét võng mạc.</p>
+            </div>
+
+            <!-- Fake Micro Scan Canvas/Pattern Box -->
+            <div class="relative w-full h-72 bg-slate-950 rounded-2xl overflow-hidden shadow-2xl border-4 border-slate-300 flex items-center justify-center mb-6 cursor-none">
+                <!-- Optical grid & illusion background -->
+                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:12px_12px]"></div>
+                <div class="absolute w-64 h-64 rounded-full border border-sky-500/30 animate-ping" style="animation-duration: 3s;"></div>
+                <div class="absolute w-48 h-48 rounded-full border border-emerald-500/20"></div>
+
+                <!-- High-Focus Red Pulse Center -->
+                <div class="relative z-10 flex flex-col items-center justify-center">
+                    <div class="w-3 h-3 bg-red-600 rounded-full animate-ping mb-1"></div>
+                    <div class="w-1.5 h-1.5 bg-white rounded-full absolute"></div>
+                    <span class="text-[9px] font-mono text-sky-400 mt-6 tracking-widest bg-slate-900/90 px-2 py-0.5 rounded border border-sky-500/30">FIXATION POINT</span>
+                </div>
+
+                <!-- Live Medical Scanner Bar -->
+                <div id="scan-bar" class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-sky-400 to-transparent hidden"></div>
+
+                <!-- Bottom Status Bar -->
+                <div class="absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur-md rounded-xl p-2.5 border border-slate-800 flex items-center justify-between text-xs font-mono text-slate-300">
+                    <span id="scan-status" class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                        Sẵn sàng quét...
+                    </span>
+                    <span id="countdown-timer" class="text-sky-400 font-bold text-sm">10.0s</span>
+                </div>
+            </div>
+
+            <button id="btn-start-scan" onclick="startTrapSequence()" class="w-full py-4 bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white font-bold rounded-2xl shadow-lg shadow-rose-200 transition-all text-base flex items-center justify-center gap-2">
+                <span>👁️ Bắt Đầu Quét Võng Mạc (10 Giây)</span>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-4 text-xs text-slate-400 border-t border-slate-200 bg-white">
+        © 2026 National Institute of Visual Acuity (NIVA). Registered Ophthalmic Protocol #99402.
+    </footer>
+
+    <!-- JUMPSCARE FULLSCREEN OVERLAY -->
+    <div id="jumpscare-overlay" class="fixed inset-0 z-50 hidden flex-col items-center justify-center bg-black overflow-hidden select-none">
+        
+        <!-- Fake Camera Flash FX -->
+        <div id="flash-effect" class="absolute inset-0 z-40 pointer-events-none hidden"></div>
+
+        <!-- Monster Canvas -->
+        <canvas id="horror-canvas" class="absolute inset-0 w-full h-full object-cover z-20"></canvas>
+
+        <!-- Blood Drip Overlay Animation -->
+        <div class="absolute inset-0 z-30 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-red-950/40 to-black"></div>
+
+        <!-- Screamer Glitch Text -->
+        <div class="relative z-30 text-center px-4">
+            <h1 class="text-7xl md:text-9xl font-black text-red-600 tracking-tighter uppercase drop-shadow-[0_10px_10px_rgba(0,0,0,1)] animate-bounce font-mono">
+                ĐÃ BỊ HÙ!
+            </h1>
+        </div>
+    </div>
+
+    <!-- TROLL & AFTERMATH SCREEN -->
+    <div id="troll-screen" class="fixed inset-0 z-50 hidden flex-col items-center justify-center bg-slate-950 text-white p-4 overflow-y-auto">
+        <div class="max-w-md w-full bg-slate-900 rounded-3xl p-6 md:p-8 text-center border border-slate-800 shadow-2xl relative my-auto">
+            
+            <!-- Troll Face Emoji / Meme -->
+            <div class="w-24 h-24 bg-red-500/10 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4 text-6xl shadow-inner">
+                🤪
+            </div>
+
+            <h2 class="text-3xl font-black text-red-500 tracking-tight mb-1">BẠN ĐÃ BỊ ĂN CÚ LỪA!</h2>
+            <p class="text-slate-400 text-xs mb-6">Thế nào? Giật bắn mình và rớt tim ra ngoài chưa? 🤣</p>
+
+            <!-- Prank Stats -->
+            <div class="grid grid-cols-2 gap-3 bg-slate-950 p-4 rounded-2xl mb-6 text-left border border-slate-800 text-xs font-mono">
+                <div>
+                    <span class="text-slate-500 block">NHỊP TIM DỰ ĐOÁN:</span>
+                    <span class="text-rose-400 font-bold text-base">180 BPM 📈</span>
+                </div>
+                <div>
+                    <span class="text-slate-500 block">ĐỘ HOẢNG SỢ:</span>
+                    <span class="text-amber-400 font-bold text-base">1000% 😱</span>
+                </div>
+            </div>
+
+            <!-- Share Tool Box -->
+            <div class="bg-slate-800/80 rounded-2xl p-4 mb-6 border border-slate-700/50 text-left">
+                <label class="block text-xs font-bold text-slate-300 mb-2">🔥 Đem đường dẫn này đi hù bạn bè tiếp:</label>
+                <div class="flex items-center gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800">
+                    <input id="share-link-input" type="text" readonly class="bg-transparent border-none text-xs text-sky-400 flex-1 outline-none font-mono px-2" value="" />
+                    <button onclick="copyPrankLink()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all active:scale-95 shadow-md shadow-sky-900">
+                        Sao chép
+                    </button>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-2 italic">
+                    💡 Mẹo gửi tin nhắn: "Mày test thử cái đo thị lực mới của Viện NIVA này xem mắt mày khỏe không, tao làm được 10/10 nè!"
+                </p>
+            </div>
+
+            <button onclick="restartAll()" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl transition-all text-sm border border-slate-700">
+                🔄 Thử Lại Từ Đầu
+            </button>
+        </div>
+    </footer>
+
+    <!-- AUDIO ENGINE & JUMPSCARE SCRIPT -->
+    <script>
+        let audioCtx = null;
+        let scanInterval = null;
+
+        // Initialize Audio Context
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Calibration audio tone (Clean 440Hz Sine)
+        function calibrateAudio() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+            
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 1.2);
+
+            const btn = document.getElementById('btn-calibrate');
+            btn.innerText = "✓ Âm Thanh Đã Hiệu Chuẩn (440Hz)";
+            btn.classList.replace('bg-sky-100', 'bg-emerald-100');
+            btn.classList.replace('text-sky-700', 'text-emerald-700');
+        }
+
+        function startTest() {
+            initAudio();
+            nextStep(1);
+        }
+
+        function nextStep(step) {
+            document.getElementById('step-0').classList.add('hidden');
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.add('hidden');
+
+            document.getElementById(`step-${step}`).classList.remove('hidden');
+        }
+
+        // Start 10-second high tension countdown
+        function startTrapSequence() {
+            initAudio();
+            const btn = document.getElementById('btn-start-scan');
+            const timer = document.getElementById('countdown-timer');
+            const status = document.getElementById('scan-status');
+            const scanBar = document.getElementById('scan-bar');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            scanBar.classList.remove('hidden');
+            scanBar.classList.add('animate-pulse');
+
+            let timeLeft = 10.0;
+
+            scanInterval = setInterval(() => {
+                timeLeft -= 0.1;
+                if (timeLeft > 0) {
+                    timer.innerText = `${timeLeft.toFixed(1)}s`;
+                    
+                    if (timeLeft < 7.0 && timeLeft > 4.0) {
+                        status.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span> Đang đo điểm vi tiêu...`;
+                    } else if (timeLeft <= 4.0) {
+                        status.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span> GIỮ NGUYÊN MẮT - SẮP HOÀN THÀNH...`;
+                        status.classList.add('text-rose-400', 'font-bold');
+                    }
+                } else {
+                    clearInterval(scanInterval);
+                    triggerBigScare();
+                }
+            }, 100);
+        }
+
+        // -------------------------------------------------------------
+        // HORROR AUDIO SYNTHESIZER (Multi-layered, Extreme High Tension)
+        // -------------------------------------------------------------
+        function playHorrorScreamerSound() {
+            if (!audioCtx) initAudio();
+            const now = audioCtx.currentTime;
+
+            // 1. High-frequency Screeching Monster Shriek (Sawtooth with Pitch Drop)
+            const shriek = audioCtx.createOscillator();
+            const shriekGain = audioCtx.createGain();
+            shriek.type = 'sawtooth';
+            shriek.frequency.setValueAtTime(4500, now);
+            shriek.frequency.exponentialRampToValueAtTime(600, now + 2.5);
+
+            // Violent Frequency Modulation (Demonic tremor)
+            const fm = audioCtx.createOscillator();
+            const fmGain = audioCtx.createGain();
+            fm.type = 'square';
+            fm.frequency.setValueAtTime(80, now);
+            fmGain.gain.setValueAtTime(800, now);
+            fm.connect(shriek.frequency);
+            fm.start(now);
+
+            shriekGain.gain.setValueAtTime(1.0, now);
+            shriekGain.gain.exponentialRampToValueAtTime(0.001, now + 3.0);
+
+            shriek.connect(shriekGain);
+            shriekGain.connect(audioCtx.destination);
+            shriek.start(now);
+
+            // 2. Harsh Metallic Impact Noise (White Noise + Highpass)
+            const bufferSize = audioCtx.sampleRate * 2.5;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.setValueAtTime(1200, now);
+
+            const noiseGain = audioCtx.createGain();
+            noiseGain.gain.setValueAtTime(1.0, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 2.0);
+
+            noise.connect(filter);
+            filter.connect(noiseGain);
+            noiseGain.connect(audioCtx.destination);
+            noise.start(now);
+
+            // 3. Sub-Bass Thruster (Heart-stopping Low-End Boom)
+            const sub = audioCtx.createOscillator();
+            const subGain = audioCtx.createGain();
+            sub.type = 'triangle';
+            sub.frequency.setValueAtTime(180, now);
+            sub.frequency.exponentialRampToValueAtTime(25, now + 2.0);
+
+            subGain.gain.setValueAtTime(1.0, now);
+            subGain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+
+            sub.connect(subGain);
+            subGain.connect(audioCtx.destination);
+            sub.start(now);
+        }
+
+        // Troll Laugh Audio Synthesizer for Aftermath
+        function playTrollLaughSound() {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+
+            for (let i = 0; i < 6; i++) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sawtooth';
+                const startTime = now + (i * 0.18);
+                
+                osc.frequency.setValueAtTime(300 + (i % 2 === 0 ? 100 : 0), startTime);
+                osc.frequency.exponentialRampToValueAtTime(150, startTime + 0.15);
+
+                gain.gain.setValueAtTime(0.3, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.15);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(startTime);
+                osc.stop(startTime + 0.15);
+            }
+        }
+
+        // -------------------------------------------------------------
+        // ADVANCED CANVAS PROCEDURAL HORROR FACE GENERATOR
+        // -------------------------------------------------------------
+        function renderDetailedMonster(canvas, zoomFactor) {
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width = window.innerWidth;
+            const h = canvas.height = window.innerHeight;
+
+            ctx.fillStyle = '#020000';
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.save();
+            ctx.translate(w / 2, h / 2);
+            ctx.scale(zoomFactor, zoomFactor);
+
+            // Rotting skull shape
+            ctx.fillStyle = '#b8b8b8';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 200, 270, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Dark veiny textures
+            ctx.strokeStyle = '#4a0000';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 16; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                const angle = (i / 16) * Math.PI * 2;
+                ctx.lineTo(Math.cos(angle) * 180, Math.sin(angle) * 240);
+                ctx.stroke();
+            }
+
+            // Giant Sunken Eye Sockets
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.ellipse(-75, -50, 65, 75, 0.1, 0, Math.PI * 2);
+            ctx.ellipse(75, -50, 65, 75, -0.1, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Bloodshot Eyes
+            ctx.fillStyle = '#8b0000';
+            ctx.beginPath();
+            ctx.arc(-75, -50, 30, 0, Math.PI * 2);
+            ctx.arc(75, -50, 30, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Pinpoint White pupils (Creepy gaze)
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(-75 + (Math.random()*8-4), -50 + (Math.random()*8-4), 6, 0, Math.PI * 2);
+            ctx.arc(75 + (Math.random()*8-4), -50 + (Math.random()*8-4), 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Massive Distorted Mouth
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.ellipse(0, 120, 95, 130, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Sharp Needle Teeth
+            ctx.fillStyle = '#fffff0';
+            for (let x = -80; x <= 80; x += 12) {
+                // Top Teeth
+                ctx.beginPath();
+                ctx.moveTo(x, 20);
+                ctx.lineTo(x + 5, 55 + Math.random()*25);
+                ctx.lineTo(x + 10, 20);
+                ctx.fill();
+
+                // Bottom Teeth
+                ctx.beginPath();
+                ctx.moveTo(x, 220);
+                ctx.lineTo(x + 5, 180 - Math.random()*25);
+                ctx.lineTo(x + 10, 220);
+                ctx.fill();
+            }
+
+            // Blood Splatters
+            ctx.fillStyle = '#ff0000';
+            for (let b = 0; b < 20; b++) {
+                ctx.beginPath();
+                ctx.arc((Math.random()-0.5)*350, (Math.random()-0.5)*400, Math.random()*12, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        }
+
+        // TRIGGER THE JUMPSCARE
+        function triggerBigScare() {
+            // Play Audio
+            playHorrorScreamerSound();
+
+            // Display Overlay
+            const overlay = document.getElementById('jumpscare-overlay');
+            const flash = document.getElementById('flash-effect');
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+
+            // Trigger Camera Flash Effect
+            flash.classList.remove('hidden');
+            flash.classList.add('animate-flashCamera');
+
+            // Extreme Shake & Strobe
+            document.body.classList.add('animate-extremeShake', 'animate-strobeHorror');
+
+            // Trigger Device Vibration
+            if ("vibrate" in navigator) {
+                navigator.vibrate([300, 50, 300, 50, 600, 50, 800]);
+            }
+
+            // Render Monster with Rapid Zoom Jump Scare Effect
+            const canvas = document.getElementById('horror-canvas');
+            let zoom = 0.6;
+            
+            const scareInterval = setInterval(() => {
+                if (zoom < 1.8) {
+                    zoom += 0.15; // Fast zoom towards user screen
+                }
+                renderDetailedMonster(canvas, zoom);
+            }, 30);
+
+            // Transition to Troll Screen after 3.8 seconds
+            setTimeout(() => {
+                clearInterval(scareInterval);
+                document.body.classList.remove('animate-extremeShake', 'animate-strobeHorror');
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+                
+                showTrollScreen();
+            }, 3800);
+        }
+
+        // SHOW TROLL / AFTERMATH SCREEN
+        function showTrollScreen() {
+            playTrollLaughSound();
+            const trollScreen = document.getElementById('troll-screen');
+            const shareInput = document.getElementById('share-link-input');
+
+            shareInput.value = window.location.href;
+            trollScreen.classList.remove('hidden');
+            trollScreen.classList.add('flex');
+        }
+
+        function copyPrankLink() {
+            const copyText = document.getElementById("share-link-input");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+
+            try {
+                document.execCommand('copy');
+                alert("Đã sao chép link ngụy trang thành công! Hãy đem đi troll bạn bè ngay nhé! 😈");
+            } catch (err) {
+                alert("Hãy nhấn giữ để sao chép liên kết thủ công.");
+            }
+        }
+
+        function restartAll() {
+            document.getElementById('troll-screen').classList.add('hidden');
+            document.getElementById('troll-screen').classList.remove('flex');
+            
+            const btn = document.getElementById('btn-start-scan');
+            if (btn) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+            if (scanInterval) clearInterval(scanInterval);
+
+            nextStep(0);
+        }
+
+        // Random Session ID Generator
+        document.getElementById('session-id').innerText = `NV-${Math.floor(1000 + Math.random() * 9000)}`;
+    </script>
+</body>
+</html>
